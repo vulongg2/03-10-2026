@@ -3,20 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1a1024">
 <title>Happy Birthday Boss</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
 <style>
 :root{--plum:#1a1024;--rose:#f2a7b8;--paper:#fbf3e6;--gold:#e8c27a;--sage:#9cc5a1;--ink:#3b2a34;
 --serif:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;--sans:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden;background:var(--plum);font-family:var(--sans);color:#fff}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:var(--plum);font-family:var(--sans);color:#fff}
 #bg{position:fixed;inset:0;background:linear-gradient(#ffd9c9,#f2a7b8 55%,#b78ab8);opacity:0;transition:opacity 4s}
 body.day #bg{opacity:1}
 canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
 .screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
 .screen.on{display:flex;animation:fade .8s}
 @keyframes fade{from{opacity:0}}
-button{font:inherit;cursor:pointer;border:0;color:inherit}
+button{font:inherit;cursor:pointer;border:0;color:inherit;touch-action:manipulation}
 :focus-visible{outline:2px solid var(--gold);outline-offset:3px}
 
 /* INTRO */
@@ -123,7 +128,8 @@ body.day .hint{color:var(--plum)}
 .diaryControls .btn.light{background:#00000010;color:var(--ink);padding:10px 18px;border-radius:99px}
 
 /* PANELS */
-.panel{background:var(--paper);color:var(--ink);width:min(620px,100%);max-height:90vh;overflow:auto;border-radius:16px;padding:26px;position:relative;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+.panel{background:var(--paper);color:var(--ink);width:min(620px,100%);max-height:90vh;overflow:auto;border-radius:16px;padding:26px;position:relative;animation:pop .6s cubic-bezier(.2,1.4,.4,1);scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.panel::-webkit-scrollbar{width:0;height:0;display:none}
 .panel h2{font:italic 500 1.8rem var(--serif);color:#a8506a;margin-bottom:14px}
 .x{position:absolute;top:10px;right:14px;background:none;color:var(--ink);font-size:1.6rem}
 .frame{aspect-ratio:4/3;border-radius:10px;background:linear-gradient(135deg,#f2a7b8,#b78ab8);display:grid;place-items:center;overflow:hidden;cursor:zoom-in;font-size:4rem}
@@ -150,6 +156,23 @@ body.day .hint{color:var(--plum)}
 .panel:has(.bk) h2{padding-left:30px}
 .story{font:500 1.2rem/1.75 var(--serif);min-height:8em}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* Siết lại khoảng cách cho điện thoại nhỏ, đỡ chật */
+@media (max-width:380px){
+  .ico i{width:68px;height:68px;font-size:2.1rem}
+  .ico span{font-size:.82rem}
+  .heart{font-size:1.8rem}
+  .top{padding:10px 18px;font-size:1rem}
+  .panel{padding:20px 16px}
+  .paper{padding:26px 20px 20px}
+  .albumart{width:150px;height:150px;font-size:3.8rem}
+  .box{font-size:5.6rem}
+  .pcontrols{gap:20px}
+}
+@media (max-height:640px){
+  .orbit{max-height:380px}
+  .title{margin-top:10px}
+}
 </style>
 </head>
 <body>
@@ -214,8 +237,8 @@ Cảm ơn vì đã lắng nghe, đã cười cùng mình, và đã ở đó nh�
 
 (Viết tiếp lời cảm ơn của bạn ở đây...)`;
 const STORIES = [   // các tập "Truyện ma sếp kể" — nghe bằng audio, giống trình phát nhạc. Thêm bao nhiêu tập cũng được
-  {icon:"👻", title:"Truyện ma sếp kể — Tập 1", note:"Kể lại đêm hôm đó ở văn phòng", audio:"assets/audio/story1.mp3"},
-  {icon:"🕯️", title:"Truyện ma sếp kể — Tập 2", note:"Chuyện xảy ra vào một đêm mưa", audio:"assets/audio/story2.mp3"},
+  {icon:"👻", title:"Ma ở chùa", note:"Đánh giá 6/10 độ ghê nha.", audio:"assets/audio/story1.mp4"},
+  {icon:"🕯️", title:"Khu đất đắp ao", note:"Chỗ này em ở nên 8/10", audio:"assets/audio/story2.ogg"},
 ];
 const DIARY = [   // "Nhật ký em viết" — mỗi chương 1 file PDF riêng + 1 bài nhạc nền riêng khi đọc
   {title:"Chương 1", pdf:"assets/diary/chuong1.pdf", audio:"assets/diary/ch1.mp3"},
@@ -279,7 +302,15 @@ const coverHTML = (cover, emoji='🎵') => {
   return `<img src="${cover}" alt="" loading="lazy" onerror="this.onerror=null;this.parentNode.textContent='${emoji}'">`;
 };
 const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); $('#'+id).classList.add('on'); };
-$('#openBtn').onclick = () => { beep(600,.15,'sine'); show('lock'); };
+/* Toàn màn hình: hoạt động trên Android Chrome (ẩn hẳn thanh địa chỉ).
+   Trên iPhone, Safari không cho JS bật fullscreen — cách duy nhất là người dùng
+   tự "Thêm vào MH chính" rồi mở từ biểu tượng đó, sẽ tự chạy không thanh địa chỉ. */
+function goFullscreen(){
+  const el = document.documentElement;
+  const req = el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || el.msRequestFullscreen;
+  if(req){ try{ req.call(el); }catch(e){} }
+}
+$('#openBtn').onclick = () => { beep(600,.15,'sine'); goFullscreen(); show('lock'); };
 
 /* --- Gửi thông báo về email qua Web3Forms (không cần backend) --- */
 async function sendNotify(subject, message){
