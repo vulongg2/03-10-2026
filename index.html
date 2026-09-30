@@ -240,11 +240,12 @@ Em xin tặng sếp món quà nhỏ này, mong nó sẽ làm sếp vui chút =) 
 
 — Người gửi`;
 const THANKS_LETTER = `
-Cảm ơn vì đã xuất hiện trong khoảng thời gian này.
+Cảm ơn sếp vì đã xuất hiện trong khoảng thời gian này. 6 tháng qua đủ dài để em cảm nhận được niềm vui của cuộc sống.. Thú thật với sếp, giờ em không còn nhớ 6 tháng trước mình làm gì vào buổi tối nữa. Bởi vì những mất mát xảy ra quá nhanh khiến cho em không kịp thích nghi nên đã tự giấu cảm xúc mình vào. Đã lâu rồi em không cảm thấy thú vui hay dư vị gì trong từng ngày của cuộc sống. Nhưng nhờ có sếp, em như lại được quay trở lại làm con người trước kia. Dù là vô tình nhưng sự vô tư của sếp đã giúp em rất nhiều.
 
-Cảm ơn vì đã lắng nghe, đã cười cùng mình, và đã ở đó những lúc mình cần nhất.
+Em cảm ơn sếp. Chúc sếp tận hưởng tuổi 17 thật vui vẻ và hạnh phúc.
 
-(Viết tiếp lời cảm ơn của bạn ở đây...)`;
+-Người gửi
+                        Vũ Hoàng Long`;
 const STORIES = [   // các tập "Truyện ma sếp kể" — nghe bằng audio, giống trình phát nhạc. Thêm bao nhiêu tập cũng được
   {icon:"👻", title:"Ma ở chùa", note:"Đánh giá 6/10 độ ghê nha.", audio:"assets/audio/story1.mp4"},
   {icon:"🕯️", title:"Khu đất đắp ao", note:"Chỗ này em ở nên 8/10", audio:"assets/audio/story2.mp3"},
@@ -256,7 +257,7 @@ const STORIES = [   // các tập "Truyện ma sếp kể" — nghe bằng audio
 const DIARY = [   // "Nhật ký em viết" — mỗi chương 1 file PDF riêng + 1 bài nhạc nền riêng khi đọc
   {title:"Chương 1", pdf:"assets/diary/chuong1.pdf", audio:"assets/diary/ch1.mp3"},
   {title:"Chương 2", pdf:"assets/diary/chuong2.pdf", audio:"assets/diary/ch2.mp3"},
-  {title:"Chương 3", pdf:"assets/diary/chuong3.pdf", audio:"assets/diary/ch3.mp3"},
+  
 ];
 const GIFT_TEXT = `🎉 + 222.222đ! \n\n(Sếp đợi chút để em bảo kế toán giải ngân.)`;
 const WEB3FORMS_KEY = "044e547d-c9f9-465e-8730-87ab1f2b9df9";    // Access Key từ web3forms.com
@@ -528,7 +529,7 @@ function storyList(){
 }
 function diaryList(){
   stopSong();
-  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><button class="bk" id="bk" aria-label="Quay lại">←</button><h2>Nhật ký em viết 📓</h2><p class="notecard" style="font-size:1rem">Từ khi được nói chuyện với sếp, em đã biết cách bày tỏ cảm xúc của mình nhiều hơn. Mỗi khi buồn vì nhớ đến quá khứ, em sẽ viết vào nhật ký. Khi nào rảnh, sếp hãy đọc "tác phẩm" đầu tay của em 🤓</p>
+  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><button class="bk" id="bk" aria-label="Quay lại">←</button><h2>Nhật ký em viết 📓</h2><p class="notecard" style="font-size:1rem">Từ khi được nói chuyện với sếp, em đã biết cách bày tỏ cảm xúc của mình nhiều hơn. Mỗi khi buồn, em sẽ viết vào nhật ký. Khi nào rảnh, sếp hãy đọc "tác phẩm" đầu tay của em 🤓.</p>
     <div class="songlist">${DIARY.map((cpt,i)=>`<button class="songrow" data-i="${i}"><span class="songcover">📖</span><span class="songinfo"><b>${cpt.title}</b></span><span class="playIcon">›</span></button>`).join('')}</div></div>`;
   ov.classList.add('on'); ov.querySelector('.x').onclick = closeOv; $('#bk').onclick = memHub;
   ov.querySelectorAll('.songrow').forEach(b => b.onclick = () => diaryChapter(+b.dataset.i));
