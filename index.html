@@ -17,7 +17,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:var(--plum);font-family:var(--sans);color:#fff}
 #bg{position:fixed;inset:0;background:linear-gradient(#ffd9c9,#f2a7b8 55%,#b78ab8);opacity:0;transition:opacity 4s}
 body.day #bg{opacity:1}
-canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1;transition:opacity .8s}
+body.dash-active canvas{opacity:.32}
 .screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
 .screen.on{display:flex;animation:fade .8s}
 @keyframes fade{from{opacity:0}}
@@ -155,23 +156,31 @@ body.day .hint{color:var(--plum)}
 .bk{position:absolute;top:10px;left:14px;background:none;color:var(--ink);font-size:1.5rem}
 .panel:has(.bk) h2{padding-left:30px}
 .story{font:500 1.2rem/1.75 var(--serif);min-height:8em}
+/* STICKY NOTES — chỉ hiện ở màn hình rộng, điện thoại luôn ẩn để không bị chật */
+.sticky{position:absolute;display:none;max-width:180px;padding:14px 16px;background:#fff4c2;color:#5c4b1e;font:600 .92rem var(--sans);line-height:1.4;border-radius:3px;box-shadow:0 10px 22px #0002,0 2px 5px #0001;transform:rotate(var(--r,0deg));z-index:0;pointer-events:none}
+.sticky::before{content:"";position:absolute;top:-8px;left:50%;translate:-50% 0;width:34px;height:13px;background:#00000012;border-radius:2px}
+@media (min-width:700px){ .sticky{display:block} }
+
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
-/* Siết lại khoảng cách cho điện thoại nhỏ, đỡ chật */
-@media (max-width:380px){
-  .ico i{width:68px;height:68px;font-size:2.1rem}
-  .ico span{font-size:.82rem}
-  .heart{font-size:1.8rem}
-  .top{padding:10px 18px;font-size:1rem}
+/* Siết lại khoảng cách cho điện thoại (390–480px là đa số iPhone/Android thật) */
+@media (max-width:480px){
+  .ico i{width:64px;height:64px;font-size:1.9rem}
+  .ico span{font-size:.78rem}
+  .heart{font-size:1.6rem}
+  .top{padding:9px 16px;font-size:.9rem}
+  .title{font-size:1.35rem;margin-top:10px}
+  .orbit{max-height:360px}
   .panel{padding:20px 16px}
   .paper{padding:26px 20px 20px}
   .albumart{width:150px;height:150px;font-size:3.8rem}
   .box{font-size:5.6rem}
-  .pcontrols{gap:20px}
+  .pcontrols{gap:18px}
+  .introtxt{margin-bottom:20px}
 }
-@media (max-height:640px){
-  .orbit{max-height:380px}
-  .title{margin-top:10px}
+@media (max-height:700px){
+  .orbit{max-height:340px}
+  .title{margin-top:6px}
 }
 </style>
 </head>
@@ -238,7 +247,11 @@ Cảm ơn vì đã lắng nghe, đã cười cùng mình, và đã ở đó nh�
 (Viết tiếp lời cảm ơn của bạn ở đây...)`;
 const STORIES = [   // các tập "Truyện ma sếp kể" — nghe bằng audio, giống trình phát nhạc. Thêm bao nhiêu tập cũng được
   {icon:"👻", title:"Ma ở chùa", note:"Đánh giá 6/10 độ ghê nha.", audio:"assets/audio/story1.mp4"},
-  {icon:"🕯️", title:"Khu đất đắp ao", note:"Chỗ này em ở nên 8/10", audio:"assets/audio/story2.ogg"},
+  {icon:"🕯️", title:"Khu đất đắp ao", note:"Chỗ này em ở nên 8/10", audio:"assets/audio/story2.mp3"},
+  {icon:"👻", title:"Ma ở côn ti", note:"Chỗ này em làm nên 9/10", audio:"assets/audio/story3.mp3"},
+  {icon:"🕯️", title:"Nhớ bà ", note:"huhu", audio:"assets/audio/story4.mp3"},
+  {icon:"👻", title:"Mơ quá dị dạng", note:"Cái này mơ nên 6/10", audio:"assets/audio/story5.mp3"},
+
 ];
 const DIARY = [   // "Nhật ký em viết" — mỗi chương 1 file PDF riêng + 1 bài nhạc nền riêng khi đọc
   {title:"Chương 1", pdf:"assets/diary/chuong1.pdf", audio:"assets/diary/ch1.mp3"},
@@ -290,6 +303,12 @@ const SONGS = [
   {title: "Nếu Phải Giữ Cho Em", artist: "J97", url: "assets/song/song23.m4a", cover: "assets/cover/song23.jpg"},
   {title: "Đứa Trẻ Mùa Đông", artist: "J97", url: "assets/song/song24.m4a", cover: "assets/cover/song24.jpg"}
 ];
+const STICKY_NOTES = [   // chỉ hiện trên màn hình rộng (≥700px). top/left tính theo % màn hình, rot là góc nghiêng
+  {text:"Chúc sếp học giỏi, thi đâu đỗ đấy!", top:"20%", left:"6%",  rot:-6},
+  {text:"Đừng thức khuya quá sếp ơiii 🥱", top:"55%", left:"5%",  rot:4},
+  {text:"Cảm ơn vì đã luôn lắng nghe em 🥹", top:"22%", left:"88%", rot:5},
+  {text:"Sếp là người sếp tốt nhất em từng gặp!", top:"58%", left:"87%", rot:-4},
+];
 const TYPE_MS = 50;               // tốc độ gõ (ms/ký tự)
 /* =============================================================== */
 
@@ -301,7 +320,17 @@ const coverHTML = (cover, emoji='🎵') => {
   if(!isImgPath(cover)) return cover;
   return `<img src="${cover}" alt="" loading="lazy" onerror="this.onerror=null;this.parentNode.textContent='${emoji}'">`;
 };
-const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); $('#'+id).classList.add('on'); };
+const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); $('#'+id).classList.add('on'); document.body.classList.toggle('dash-active', id==='dash'); };
+(function renderStickies(){
+  const dash = $('#dash'), orbit = dash.querySelector('.orbit');
+  STICKY_NOTES.forEach(n => {
+    const d = document.createElement('div');
+    d.className = 'sticky';
+    d.style.top = n.top; d.style.left = n.left; d.style.setProperty('--r', (n.rot||0)+'deg');
+    d.textContent = n.text;
+    dash.insertBefore(d, orbit);
+  });
+})();
 /* Toàn màn hình: hoạt động trên Android Chrome (ẩn hẳn thanh địa chỉ).
    Trên iPhone, Safari không cho JS bật fullscreen — cách duy nhất là người dùng
    tự "Thêm vào MH chính" rồi mở từ biểu tượng đó, sẽ tự chạy không thanh địa chỉ. */
@@ -484,7 +513,7 @@ function openPlayer(i){
 function memHub(){
   stopSong();
   ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><h2>Kỷ niệm</h2><div class="hub">
-    <button class="ico2" data-k="ghost"><i>👻</i><span>Truyện ma sếp kể</span></button>
+    <button class="ico2" data-k="ghost"><i>👻</i><span>Truyện ma</span></button>
     <button class="ico2" data-k="diary"><i>📓</i><span>Nhật ký em viết</span></button>
   </div></div>`;
   ov.classList.add('on'); ov.querySelector('.x').onclick = closeOv;
@@ -492,7 +521,7 @@ function memHub(){
 }
 function storyList(){
   stopSong();
-  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><button class="bk" id="bk" aria-label="Quay lại">←</button><h2>Truyện ma sếp kể 👻</h2><p class="notecard" style="font-size:1rem">Chạm vào một tập để nghe lại</p>
+  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><button class="bk" id="bk" aria-label="Quay lại">←</button><h2>Mong sếp nhiều hứu duyên và update thêm 👻</h2><p class="notecard" style="font-size:1rem">Chạm vào một tập để nghe lại</p>
     <div class="songlist">${STORIES.map((s,i)=>`<button class="songrow" data-i="${i}"><span class="songcover">${s.icon}</span><span class="songinfo"><b>${s.title}</b><small>${s.note||''}</small></span><span class="playIcon">▶</span></button>`).join('')}</div></div>`;
   ov.classList.add('on'); ov.querySelector('.x').onclick = closeOv; $('#bk').onclick = memHub;
   ov.querySelectorAll('.songrow').forEach(b => b.onclick = () => story(+b.dataset.i));
