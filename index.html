@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Happy Birthday Boss</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+<style>
+:root{--plum:#1a1024;--rose:#f2a7b8;--paper:#fbf3e6;--gold:#e8c27a;--sage:#9cc5a1;--ink:#3b2a34;
+--serif:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;--sans:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--plum);font-family:var(--sans);color:#fff}
+#bg{position:fixed;inset:0;background:linear-gradient(#ffd9c9,#f2a7b8 55%,#b78ab8);opacity:0;transition:opacity 4s}
+body.day #bg{opacity:1}
+canvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.screen{position:fixed;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:2;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
+.screen.on{display:flex;animation:fade .8s}
+@keyframes fade{from{opacity:0}}
+button{font:inherit;cursor:pointer;border:0;color:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+/* INTRO */
+.introtxt{font:italic 500 clamp(1.4rem,6vw,2rem) var(--serif);text-align:center;line-height:1.6;margin-bottom:28px;color:var(--rose)}
+#intro{gap:6px}
+
+/* LOCK */
+.safe{background:linear-gradient(#2a1c38,#160d20);border:2px solid #4a3a5c;border-radius:22px;padding:26px 24px;width:min(320px,100%);box-shadow:0 20px 60px #000a}
+.safe h1{font:italic 500 1.5rem var(--serif);text-align:center;color:var(--gold);margin-bottom:14px}
+#disp{height:54px;background:#0a0610;border-radius:10px;border:1px solid #4a3a5c;display:flex;align-items:center;justify-content:center;gap:10px;font-size:1.6rem;color:var(--sage);letter-spacing:4px;margin-bottom:8px;text-shadow:0 0 10px var(--sage)}
+#msg{min-height:38px;line-height:1.3;text-align:center;font-size:.85rem;color:#ff8a9a;margin-bottom:8px}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pad button{height:56px;border-radius:12px;background:#3a2b4c;font-size:1.3rem;font-weight:700;box-shadow:0 4px 0 #1f1530;transition:.08s}
+.pad button:active{transform:translateY(4px);box-shadow:none;background:#54406e}
+.pad .ok{background:var(--gold);color:var(--plum);box-shadow:0 4px 0 #a98a45}
+.safe.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.safe.open{animation:openS 1s forwards}
+@keyframes openS{to{transform:scale(1.15);opacity:0;filter:blur(6px)}}
+
+/* ENVELOPE */
+.env{width:min(300px,80vw);height:200px;background:#f4d7c4;border-radius:6px;position:relative;cursor:pointer;box-shadow:0 20px 50px #0007;transition:transform .3s;animation:float 3s ease-in-out infinite}
+.env:hover{transform:scale(1.04)}
+.env::before{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent 49%,#e8bda3 50%) left/50% 100% no-repeat,linear-gradient(to top left,transparent 49%,#e8bda3 50%) right/50% 100% no-repeat}
+.env .flap{position:absolute;top:0;left:0;right:0;height:110px;background:#eccab4;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .6s}
+.env .seal{position:absolute;top:84px;left:50%;translate:-50% 0;font-size:2rem;z-index:2}
+.env.open{animation:none}.env.open .flap{transform:rotateX(180deg)}
+@keyframes float{50%{translate:0 -8px}}
+.hint{margin-top:26px;color:var(--rose);animation:blink 1.6s infinite}
+@keyframes blink{50%{opacity:.3}}
+body.day .hint{color:var(--plum)}
+
+/* LETTER */
+.overlay{position:fixed;inset:0;z-index:5;display:none;align-items:center;justify-content:center;padding:16px;background:#1a102466;backdrop-filter:blur(3px)}
+.overlay.on{display:flex}
+.paper{background:var(--paper);color:var(--ink);width:min(560px,100%);max-height:88vh;overflow:auto;border-radius:6px;padding:34px 30px 26px;font:500 1.25rem/1.75 var(--serif);box-shadow:0 30px 80px #0008;animation:pop .8s cubic-bezier(.2,1.6,.4,1)}
+/* Ẩn thanh cuộn nhưng vẫn cuộn được bằng lăn chuột / vuốt tay */
+.paper{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.paper::-webkit-scrollbar{width:0;height:0;display:none}
+@keyframes pop{from{transform:translateY(160px) scale(.5) rotate(-6deg);opacity:0}}
+.paper h2{font-style:italic;margin-bottom:12px;color:#a8506a}
+.txt{white-space:pre-wrap;min-height:6em}
+.caret::after{content:"|";animation:blink .7s infinite;color:#a8506a}
+.btn{margin-top:18px;padding:10px 26px;border-radius:99px;background:#a8506a;color:#fff;font-weight:700;opacity:0;pointer-events:none;transition:.5s}
+.btn.show{opacity:1;pointer-events:auto}
+.btn.light{background:#ffffff22;opacity:1;pointer-events:auto}
+
+/* DASHBOARD */
+#dash{justify-content:flex-start;padding-top:max(24px,env(safe-area-inset-top))}
+.top{padding:12px 24px;border-radius:99px;background:#fbf3e6dd;color:var(--ink);font:italic 500 1.2rem var(--serif);box-shadow:0 8px 24px #0004;transition:.3s}
+.top:hover{transform:translateY(3px) scale(1.04)}
+.title{margin-top:20px;font:italic 500 clamp(1.6rem,6vw,2.4rem) var(--serif);color:var(--plum);text-align:center}
+.orbit{position:relative;flex:1;width:min(420px,100%);max-height:460px}
+.ico{position:absolute;translate:-50% -50%;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;color:var(--plum);font-weight:700;font-size:.95rem}
+.ico i{font-style:normal;font-size:2.6rem;width:82px;height:82px;display:grid;place-items:center;border-radius:50%;background:#fbf3e6cc;box-shadow:0 0 0 0 #fff0,0 8px 24px #0003;transition:.3s}
+.ico:hover i,.ico:focus-visible i{transform:scale(1.18);box-shadow:0 0 30px 8px #ffe7a8;animation:wig .5s}
+@keyframes wig{25%{rotate:-10deg}75%{rotate:10deg}}
+.ico span{opacity:.7;transition:.3s}.ico:hover span{opacity:1}
+.ico:active i,.ico2:active i{transform:scale(1.18);box-shadow:0 0 30px 8px #ffe7a8}
+.heart{position:absolute;translate:-50% -50%;font-size:2.2rem;pointer-events:none;animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.15)}}
+
+/* LETTER extras */
+.letterdate{text-align:right;font-family:var(--sans);font-size:.8rem;opacity:.55;margin-bottom:6px}
+.sign{font:italic 600 1.15rem var(--sans);text-align:right;margin-top:10px;opacity:0;transition:.6s}
+.sign.show{opacity:1}
+.divider{border:0;border-top:1px solid #a8506a44;margin:10px 0}
+.wform{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.wform input,.wform textarea{font:500 1rem var(--sans);padding:12px 14px;border-radius:10px;border:1px solid #a8506a33;background:#fff;color:var(--ink);resize:vertical}
+.wform input:focus,.wform textarea:focus{outline:2px solid #a8506a55}
+.wform .btn{align-self:flex-start}
+.wform #wstatus{font:500 .95rem var(--sans);color:#5d8f66;min-height:1.2em}
+.notecard{font:italic 500 1.3rem var(--serif);color:#a8506a;margin-top:10px}
+
+/* PLAYLIST */
+.songlist{display:flex;flex-direction:column;gap:8px;margin-top:14px}
+.songrow{display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border-radius:12px;background:#fff;box-shadow:0 3px 10px #a8506a1a;text-align:left;transition:.15s}
+.songrow:active{transform:scale(.98)}
+.songcover{font-size:1.5rem;width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#f2a7b8,#b78ab8);display:grid;place-items:center;flex-shrink:0}
+.songinfo{flex:1;display:flex;flex-direction:column;overflow:hidden;color:var(--ink)}
+.songinfo b{font-family:var(--serif);font-size:1.05rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.songinfo small{opacity:.6}
+.playIcon{opacity:.35;color:var(--ink)}
+/* Ảnh cover hiển thị đúng khung */
+.songcover,.albumart{overflow:hidden}
+.songcover img,.albumart img{width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block}
+
+/* PLAYER (kiểu iPhone Music) */
+.player{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:46px}
+.albumart{width:180px;height:180px;border-radius:20px;background:linear-gradient(135deg,#f2a7b8,#b78ab8,#e8c27a);display:grid;place-items:center;font-size:4.5rem;box-shadow:0 16px 40px #0003;margin-bottom:20px}
+.ptitle{font:600 1.25rem var(--sans);color:var(--ink);margin-bottom:2px}
+.partist{opacity:.6;color:var(--ink);margin-bottom:18px}
+#pseek{width:100%;accent-color:#a8506a}
+.ptime{display:flex;justify-content:space-between;width:100%;font-size:.75rem;opacity:.55;color:var(--ink);margin-top:2px}
+.pcontrols{display:flex;align-items:center;gap:28px;margin-top:22px}
+.pcontrols button{font-size:1.5rem;background:none;color:var(--ink)}
+#pplay{width:62px;height:62px;border-radius:50%;background:var(--ink);color:#fff;font-size:1.5rem;display:grid;place-items:center}
+
+/* DIARY (PDF + nhạc nền theo chương) */
+.diaryPanel{padding-top:46px}
+.pdfFrame{width:100%;height:56vh;border:0;border-radius:10px;background:#fff;box-shadow:0 4px 16px #0002;margin-top:10px}
+.diaryControls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
+.diaryControls button{padding:10px 18px;border-radius:99px;background:#a8506a;color:#fff;font-weight:600}
+.diaryControls .btn.light{background:#00000010;color:var(--ink);padding:10px 18px;border-radius:99px}
+
+/* PANELS */
+.panel{background:var(--paper);color:var(--ink);width:min(620px,100%);max-height:90vh;overflow:auto;border-radius:16px;padding:26px;position:relative;animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+.panel h2{font:italic 500 1.8rem var(--serif);color:#a8506a;margin-bottom:14px}
+.x{position:absolute;top:10px;right:14px;background:none;color:var(--ink);font-size:1.6rem}
+.frame{aspect-ratio:4/3;border-radius:10px;background:linear-gradient(135deg,#f2a7b8,#b78ab8);display:grid;place-items:center;overflow:hidden;cursor:zoom-in;font-size:4rem}
+.frame img{width:100%;height:100%;object-fit:cover}
+.frame.zoom{position:fixed;inset:0;z-index:9;border-radius:0;aspect-ratio:auto;background:#000e;cursor:zoom-out}
+.frame.zoom img{object-fit:contain}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.nav button{background:#a8506a;color:#fff;width:40px;height:40px;border-radius:50%;font-size:1.2rem}
+.cap{text-align:center;font:italic 1.1rem var(--serif)}
+.gift{text-align:center}
+.box{font-size:7rem;background:none;display:block;margin:10px auto;animation:float 2s infinite}
+.box.open{animation:boom .6s forwards}
+@keyframes boom{50%{transform:scale(1.5) rotate(10deg)}100%{transform:scale(1)}}
+.reveal{font:500 1.25rem/1.7 var(--serif);white-space:pre-wrap;margin-top:12px;opacity:0;transition:1s}.reveal.show{opacity:1}
+.wish{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.wish div{background:#fff;border-radius:12px;padding:16px;box-shadow:0 4px 14px #a8506a22;font:500 1.15rem var(--serif);transition:.3s;cursor:pointer}
+.wish div:hover{transform:translateY(-4px) rotate(-1deg)}
+.wish div.done{background:#ffe7ee;text-decoration:line-through;opacity:.7}
+.hub{display:flex;flex-wrap:wrap;justify-content:center;gap:22px;padding:14px 0 6px}
+.ico2{display:flex;flex-direction:column;align-items:center;gap:8px;background:none;color:var(--ink);font-weight:700;font-size:.9rem;width:110px}
+.ico2 i{font-style:normal;font-size:2.4rem;width:80px;height:80px;display:grid;place-items:center;border-radius:50%;background:#fff;box-shadow:0 6px 18px #a8506a33;transition:.3s}
+.ico2:hover i,.ico2:focus-visible i{transform:scale(1.15);box-shadow:0 0 26px 6px #ffe7a8;animation:wig .5s}
+.bk{position:absolute;top:10px;left:14px;background:none;color:var(--ink);font-size:1.5rem}
+.panel:has(.bk) h2{padding-left:30px}
+.story{font:500 1.2rem/1.75 var(--serif);min-height:8em}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="bg"></div>
+<canvas id="cv"></canvas>
+
+<section class="screen on" id="intro">
+  <p class="introtxt">Happy Birthday<br>Sếp Bùi Ngọc Hải An</p>
+  <button class="btn light" id="openBtn">Mở</button>
+</section>
+
+<section class="screen" id="lock">
+  <div class="safe" id="safe">
+    <h1>Nhập mật khẩu điii</h1>
+    <div id="disp"></div>
+    <div id="msg"></div>
+    <div class="pad" id="pad"></div>
+  </div>
+</section>
+
+<section class="screen" id="env">
+  <div class="env" id="envelope" tabindex="0" role="button" aria-label="Mở thư"><div class="flap"></div><div class="seal">🤓</div></div>
+  <p class="hint">Một bức thư dành cho sếp — chạm để mở</p>
+</section>
+
+<section class="screen" id="dash">
+  <button class="top" id="topLetter">✉️ Một lá thư dành cho sếp</button>
+  <h2 class="title" id="dashTitle"></h2>
+  <div class="orbit">
+    <button class="ico" data-k="thanks" style="left:50%;top:13%"><i>💌</i><span>Thư cảm ơn</span></button>
+    <button class="ico" data-k="memories" style="left:20%;top:40%"><i>📸</i><span>Kỷ niệm</span></button>
+    <button class="ico" data-k="gift" style="left:80%;top:40%"><i>🎁</i><span>Quà</span></button>
+    <div class="heart" style="left:50%;top:58%">🌷</div>
+    <button class="ico" data-k="music" style="left:27%;top:80%"><i>🎵</i><span>Playlist</span></button>
+    <button class="ico" data-k="wish" style="left:73%;top:80%"><i>⭐</i><span>Wishlist</span></button>
+  </div>
+</section>
+
+<div class="overlay" id="ov"></div>
+
+<script>
+/* ===================== CONFIG — SỬA Ở ĐÂY ===================== */
+const CODE = "1";          // mật mã (chỉ số). Ví dụ ngày sinh 02/02/2006
+const NAME = "Bùi Ngọc Hải An";              // tên bạn của bạn
+const BIRTHDAY_LETTER = `Gửi ${NAME},
+
+Chúc mừng sinh nhật sếp tuổi 17. 🎂
+
+Chúc sếp mau ăn chóng lớn. 
+
+Em mong tuổi 17 của sếp sẽ thật vui vẻ, hạnh phúc và tận hưởng được niềm vui của năm học cuối cấp nàyy. 
+
+Em mong sếp đạt được nguyện vọng mình thích và đỗ được đại học mình mong muốn.
+
+Em xin tặng sếp món quà nhỏ này, mong nó sẽ làm sếp vui chút =) .
+
+— Người gửi`;
+const THANKS_LETTER = `
+Cảm ơn vì đã xuất hiện trong khoảng thời gian này.
+
+Cảm ơn vì đã lắng nghe, đã cười cùng mình, và đã ở đó những lúc mình cần nhất.
+
+(Viết tiếp lời cảm ơn của bạn ở đây...)`;
+const STORIES = [   // các tập "Truyện ma sếp kể" — nghe bằng audio, giống trình phát nhạc. Thêm bao nhiêu tập cũng được
+  {icon:"👻", title:"Truyện ma sếp kể — Tập 1", note:"Kể lại đêm hôm đó ở văn phòng", audio:"assets/audio/story1.mp3"},
+  {icon:"🕯️", title:"Truyện ma sếp kể — Tập 2", note:"Chuyện xảy ra vào một đêm mưa", audio:"assets/audio/story2.mp3"},
+];
+const DIARY = [   // "Nhật ký em viết" — mỗi chương 1 file PDF riêng + 1 bài nhạc nền riêng khi đọc
+  {title:"Chương 1", pdf:"assets/diary/chuong1.pdf", audio:"assets/diary/ch1.mp3"},
+  {title:"Chương 2", pdf:"assets/diary/chuong2.pdf", audio:"assets/diary/ch2.mp3"},
+  {title:"Chương 3", pdf:"assets/diary/chuong3.pdf", audio:"assets/diary/ch3.mp3"},
+];
+const GIFT_TEXT = `🎉 + 222.222đ! \n\n(Sếp đợi chút để em bảo kế toán giải ngân.)`;
+const WEB3FORMS_KEY = "044e547d-c9f9-465e-8730-87ab1f2b9df9";    // Access Key từ web3forms.com
+const TO_NAME = "Long";      // tên người sẽ nhận thông báo (hiện trong nút "Gửi cho ...")
+const WISHES = [  // mỗi mục 1 thẻ trong Wishlist. type: "link" | "link_size" | "text"
+  {icon:"📖", label:"Sách", type:"link"},
+  {icon:"🎧", label:"Tai nghe", type:"link"},
+  {icon:"👕", label:"Quần áo", type:"link_size"},
+  {icon:"💭", label:"Điều sếp muốn nóii", type:"text"},
+  {icon:"👔", label:"Điều gì sếp thích", type:"link"},
+];
+const MUSIC = "assets/bg/song.mp3";                 // ví dụ "assets/music/song.mp3" (để trống nếu không dùng)
+const LOCK_HINTS = [
+  "Sai ruii",
+  "Hình như là ngày sinhh.",
+  "Ngày sinh của sếp ấyyy =)) 💡"
+];
+const LETTER_DATE = "03.10.2026";     // ngày hiện trên thư, sửa theo ý bạn
+const SIGNATURE = "Trưởng phòng tài chính — Long";           // chữ ký cuối thư
+const PLAYLIST_NOTE = "Full J97";
+const SONGS = [
+  {title: "Hồng Nhan", artist: "J97", url: "assets/song/song1.m4a", cover: "assets/cover/song1.jpg"},
+  {title: "Bạc Phận", artist: "J97", url: "assets/song/song2.m4a", cover: "assets/cover/song2.jpg"},
+  {title: "Sóng Gió", artist: "J97", url: "assets/song/song3.m4a", cover: "assets/cover/song3.jpg"},
+  {title: "Sao Em Vô Tình", artist: "J97", url: "assets/song/song4.m4a", cover: "assets/cover/song4.jpg"},
+  {title: "Em Gì Ơi", artist: "J97", url: "assets/song/song5.m4a", cover: "assets/cover/song5.jpg"},
+  {title: "Việt Nam Tôi", artist: "J97", url: "assets/song/song6.m4a", cover: "assets/cover/song6.jpg"},
+  {title: "Hoa Vô Sắc", artist: "J97", url: "assets/song/song7.m4a", cover: "assets/cover/song7.jpg"},
+  {title: "Là 1 Thằng Con Trai", artist: "J97", url: "assets/song/song8.m4a", cover: "assets/cover/song8.jpg"},
+  {title: "Đom Đóm", artist: "J97", url: "assets/song/song9.m4a", cover: "assets/cover/song9.jpg"},
+  {title: "LAYLALAY", artist: "J97", url: "assets/song/song10.m4a", cover: "assets/cover/song10.jpg"},
+  {title: "Ngôi Sao Cô Đơn", artist: "J97", url: "assets/song/song11.m4a", cover: "assets/cover/song11.jpg"},
+  {title: "Cuối Cùng Thì", artist: "J97", url: "assets/song/song12.m4a", cover: "assets/cover/song12.jpg"},
+  {title: "Xóa Tên Anh Đi", artist: "J97", url: "assets/song/song13.m4a", cover: "assets/cover/song13.jpg"},
+  {title: "Từ Nơi Tôi Sinh Ra", artist: "J97", url: "assets/song/song14.m4a", cover: "assets/cover/song14.jpg"},
+  {title: "Thiên Lý Ơi", artist: "J97", url: "assets/song/song15.m4a", cover: "assets/cover/song15.jpg"},
+  {title: "Về Bên Anh", artist: "J97", url: "assets/song/song16.m4a", cover: "assets/cover/song16.jpg"},
+  {title: "Giai Điệu Miền Tây", artist: "J97", url: "assets/song/song17.m4a", cover: "assets/cover/song17.jpg"},
+  {title: "Tam Thái Tử", artist: "J97", url: "assets/song/song18.m4a", cover: "assets/cover/song18.jpg"},
+  {title: "Lưu Niên", artist: "J97", url: "assets/song/song19.m4a", cover: "assets/cover/song19.jpg"},
+  {title: "Người Dưng", artist: "J97", url: "assets/song/song20.m4a", cover: "assets/cover/song20.jpg"},
+  {title: "Anh Yêu Em", artist: "J97", url: "assets/song/song21.m4a", cover: "assets/cover/song21.jpg"},
+  {title: "Hoa Trong Đá", artist: "J97", url: "assets/song/song22.m4a", cover: "assets/cover/song22.jpg"},
+  {title: "Nếu Phải Giữ Cho Em", artist: "J97", url: "assets/song/song23.m4a", cover: "assets/cover/song23.jpg"},
+  {title: "Đứa Trẻ Mùa Đông", artist: "J97", url: "assets/song/song24.m4a", cover: "assets/cover/song24.jpg"}
+];
+const TYPE_MS = 50;               // tốc độ gõ (ms/ký tự)
+/* =============================================================== */
+
+const $ = s => document.querySelector(s);
+/* Cover: nếu là đường dẫn ảnh -> render <img>, nếu là emoji/chữ -> render text */
+const isImgPath = v => /\.(png|jpe?g|webp|gif|avif|svg)(\?.*)?$/i.test(v||'');
+const coverHTML = (cover, emoji='🎵') => {
+  if(!cover) return emoji;
+  if(!isImgPath(cover)) return cover;
+  return `<img src="${cover}" alt="" loading="lazy" onerror="this.onerror=null;this.parentNode.textContent='${emoji}'">`;
+};
+const show = id => { document.querySelectorAll('.screen').forEach(s => s.classList.remove('on')); $('#'+id).classList.add('on'); };
+$('#openBtn').onclick = () => { beep(600,.15,'sine'); show('lock'); };
+
+/* --- Gửi thông báo về email qua Web3Forms (không cần backend) --- */
+async function sendNotify(subject, message){
+  if(!WEB3FORMS_KEY) { console.warn('Chưa cấu hình WEB3FORMS_KEY — xem CONFIG ở đầu file.'); return false; }
+  try{
+    const res = await fetch('https://api.web3forms.com/submit', {
+      method:'POST', headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, message, from_name: `Website sinh nhật của ${NAME}` })
+    });
+    const data = await res.json();
+    return !!data.success;
+  } catch(e){ return false; }
+}
+
+/* --- âm thanh nhỏ bằng WebAudio (không cần file) --- */
+let AC; const beep = (f=600,d=.07,t='square',v=.05) => { try{ AC = AC || new AudioContext(); const o=AC.createOscillator(),g=AC.createGain(); o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d);}catch(e){} };
+const unlockSound = () => [523,659,784,1047].forEach((f,i)=>setTimeout(()=>beep(f,.25,'sine',.08),i*110));
+
+/* --- 1. KHÓA --- */
+let input = "", wrongCount = 0;
+const pad = $('#pad');
+[1,2,3,4,5,6,7,8,9,'⌫',0,'OK'].forEach(k=>{
+  const b = document.createElement('button'); b.textContent = k;
+  if(k==='OK') b.className='ok';
+  b.onclick = () => press(k); pad.appendChild(b);
+});
+function drawDisp(){ $('#disp').textContent = input ? '•'.repeat(input.length) : '······'; }
+function press(k){
+  beep(k==='OK'?900:500);
+  $('#msg').textContent='';
+  if(k==='⌫') input = input.slice(0,-1);
+  else if(k==='OK') return check();
+  else if(input.length < CODE.length) input += k;
+  drawDisp();
+  if(input.length === CODE.length && k!=='⌫') setTimeout(check,250);
+}
+function check(){
+  if(input === CODE){
+    unlockSound(); $('#safe').classList.add('open'); $('#msg').textContent='';
+    if(MUSIC){ bgMusic=new Audio(MUSIC); bgMusic.loop=true; bgMusic.volume=.5; bgMusic.play().catch(()=>{}); }
+    setTimeout(()=>show('env'),1000);
+  } else {
+    beep(150,.3,'sawtooth',.08);
+    $('#safe').classList.remove('shake'); void $('#safe').offsetWidth; $('#safe').classList.add('shake');
+    const hint = LOCK_HINTS[Math.min(wrongCount, LOCK_HINTS.length-1)]; wrongCount++;
+    $('#msg').textContent = hint; input=''; drawDisp();
+  }
+}
+document.addEventListener('keydown',e=>{
+  if(!$('#lock').classList.contains('on')) return;
+  if(/^\d$/.test(e.key)) press(e.key); else if(e.key==='Backspace') press('⌫'); else if(e.key==='Enter') press('OK');
+});
+drawDisp();
+
+/* --- Gõ chữ từng ký tự --- */
+let typer;
+function typeText(el, text, done){
+  clearInterval(typer); el.textContent=''; el.classList.add('caret'); let i=0; const chars=[...text];
+  const finish=()=>{clearInterval(typer);el.textContent=text;el.classList.remove('caret');done&&done();done=null;};
+  typer = setInterval(()=>{ el.textContent += chars[i++]; if(i>=chars.length) finish(); }, TYPE_MS);
+  el.onclick = finish; // chạm vào thư để hiện hết
+}
+const ov = $('#ov');
+let audioEl = null, bgMusic = null;
+function duckMusic(){ if(bgMusic && !bgMusic.paused) bgMusic.pause(); }
+function clearAudioHandlers(){ if(audioEl){ audioEl.pause(); audioEl.onloadedmetadata=null; audioEl.ontimeupdate=null; audioEl.onended=null; audioEl.onplay=null; audioEl.onpause=null; } }
+function stopSong(){ clearAudioHandlers(); if(bgMusic) bgMusic.play().catch(()=>{}); }
+const closeOv = () => { clearInterval(typer); stopSong(); ov.classList.remove('on'); ov.innerHTML=''; };
+function openLetter(title, text, btnLabel, onDone, opts={}){
+  const dateHtml = opts.date ? `<div class="letterdate">${opts.date}</div>` : '';
+  const signHtml = opts.sign ? `<div class="sign" id="sg">${opts.sign}</div>` : '';
+  ov.innerHTML = `<div class="paper">${dateHtml}<h2>${title}</h2><hr class="divider"><div class="txt" id="t"></div>${signHtml}<button class="btn" id="b">${btnLabel}</button></div>`;
+  ov.classList.add('on');
+  const b=$('#b'); b.onclick = () => { closeOv(); onDone&&onDone(); };
+  typeText($('#t'), text, () => { b.classList.add('show'); const sg=$('#sg'); sg&&sg.classList.add('show'); });
+}
+
+/* --- 2. PHONG BÌ (mở theo nhịp) --- */
+function openEnvelope(){
+  const e=$('#envelope'); if(e.classList.contains('open')) return;
+  beep(400,.2,'sine');
+  const rc = e.getBoundingClientRect(), cx = rc.left+rc.width/2, cy = rc.top+rc.height/2;
+  document.body.classList.add('day');           // 0.0s ánh sáng bắt đầu xuất hiện (fade 4s)
+  setTimeout(startFlowers, 500);                 // 0.5s chồi hoa bắt đầu mọc từ dưới lên
+  setTimeout(() => burstRing(cx, cy), 700);        // 0.7s vòng hoa bắt đầu nở kín màn hình, chừa vùng quanh phong bì (bán kính từ 190px trở ra)
+  setTimeout(() => e.classList.add('open'), 1500); // 1.5s phong bì mở, lá thư sẵn sàng bay ra
+  setTimeout(() => openLetter('Chúc mừng sinh nhật 🎂', BIRTHDAY_LETTER, 'Tiếp tục ✿', goDash,
+    {date: LETTER_DATE, sign: SIGNATURE}), 3900);  // 3.9s thư hiện, sau khi vòng hoa đã nở gần hết và đang xoay nhẹ
+}
+$('#envelope').onclick = openEnvelope;
+$('#envelope').onkeydown = e => { if(e.key==='Enter'||e.key===' ') openEnvelope(); };
+
+/* --- 3. DASHBOARD --- */
+function goDash(){ $('#dashTitle').textContent = `Món quà nhỏ dành cho sếp An`; show('dash'); }
+$('#topLetter').onclick = () => openLetter('Chúc mừng sinh nhật 🎂', BIRTHDAY_LETTER, 'Đóng',goDash,
+    {date: LETTER_DATE, sign: SIGNATURE}, null);
+document.querySelectorAll('.ico').forEach(b => b.onclick = () => panel(b.dataset.k));
+
+/* --- 4. NỘI DUNG CÁC ICON --- */
+function panel(k){
+  beep(700,.1,'sine');
+  if(k==='thanks') return openLetter('Thư cảm ơn 💌', THANKS_LETTER, 'Đóng', null);
+  if(k==='memories') return memHub();
+  let h='';
+  if(k==='music') return musicList();
+  if(k==='gift') h=`<div class="gift"><h2>Quà 🎁</h2><button class="box" id="box" aria-label="Mở hộp quà">🎁</button><small>Chạm vào hộp quà</small><div class="reveal" id="rv"></div></div>`;
+  if(k==='wish') h=`<h2>Có điều gì sếp muốn khôngg ⭐</h2><div class="hub">${WISHES.map((w,i)=>`<button class="ico2" data-i="${i}"><i>${w.icon}</i><span>${w.label}</span></button>`).join('')}</div>`;
+  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button>${h}</div>`;
+  ov.classList.add('on'); ov.querySelector('.x').onclick = closeOv;
+  if(k==='gift') $('#box').onclick = async () => {
+    const b=$('#box'); if(b.classList.contains('open')) return; b.classList.add('open'); b.textContent='🎊'; unlockSound(); burst();
+    $('#rv').textContent=GIFT_TEXT; setTimeout(()=>$('#rv').classList.add('show'),50);
+    sendNotify(`${NAME} vừa mở quà 🎁`, `${NAME} vừa mở món quà trên website sinh nhật.\nThời gian: ${new Date().toLocaleString('vi-VN')}`);
+  };
+  if(k==='wish') ov.querySelectorAll('.ico2').forEach(b=>b.onclick=()=>{ beep(700,.1,'sine'); wishForm(+b.dataset.i); });
+}
+function wishForm(i){
+  const w = WISHES[i];
+  let fields = w.type==='text'
+    ? `<textarea id="wtxt" rows="3" placeholder="Viết điều sếp thích..."></textarea>`
+    : `<input id="wlink" type="url" placeholder="Dán link sản phẩm...">` + (w.type==='link_size' ? `<input id="wsize" type="text" placeholder="Size (S / M / L...)">` : '');
+  fields += `<input id="waddr" type="text" placeholder="Địa chỉ nhận ">`;
+  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><button class="bk" id="bk" aria-label="Quay lại">←</button><h2>${w.icon} ${w.label}</h2><div class="wform">${fields}<button class="btn show" id="wsend">Gửi cho ${TO_NAME}</button><p id="wstatus"></p></div></div>`;
+  ov.classList.add('on');
+  ov.querySelector('.x').onclick = closeOv; $('#bk').onclick = () => panel('wish');
+  $('#wsend').onclick = async () => {
+    const btn=$('#wsend'); btn.disabled=true; btn.textContent='Đang gửi...';
+    let msg = `${NAME} vừa chọn một món trong Wishlist ${w.icon}\nMón: ${w.label}\n`;
+    if(w.type==='text') msg += `Nội dung: ${$('#wtxt').value || '(để trống)'}\n`;
+    else { msg += `Link: ${$('#wlink').value || '(để trống)'}\n`; if(w.type==='link_size') msg += `Size: ${$('#wsize').value || '(để trống)'}\n`; }
+    msg += `Địa chỉ nhận: ${$('#waddr').value || '(để trống)'}\n`;
+    msg += `Thời gian: ${new Date().toLocaleString('vi-VN')}`;
+    const ok = await sendNotify(`${NAME} vừa chọn một món trong Wishlist`, msg);
+    $('#wstatus').textContent = ok ? `✉️ Đã gửi rồi. ${TO_NAME} sẽ nhận được món này.` : 'Gửi chưa thành công, thử lại nhé.';
+    if(ok) btn.style.display='none'; else { btn.disabled=false; btn.textContent=`Gửi cho ${TO_NAME}`; }
+  };
+}
+function musicList(){
+  stopSong();
+  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><h2>Playlist em nghĩ sếp thích 🎵</h2><p class="notecard" style="font-size:1rem">${PLAYLIST_NOTE}</p>
+    <div class="songlist">${SONGS.map((s,i)=>`<button class="songrow" data-i="${i}"><span class="songcover">${coverHTML(s.cover)}</span><span class="songinfo"><b>${s.title}</b><small>${s.artist}</small></span><span class="playIcon">▶</span></button>`).join('')}</div></div>`;
+  ov.classList.add('on'); ov.querySelector('.x').onclick = closeOv;
+  ov.querySelectorAll('.songrow').forEach(b => b.onclick = () => openPlayer(+b.dataset.i));
+}
+function openPlayer(i){
+  const s = SONGS[i];
+  duckMusic(); clearAudioHandlers(); if(!audioEl) audioEl = new Audio();
+  audioEl.src = s.url; audioEl.currentTime = 0;
+  ov.innerHTML = `<div class="panel player"><button class="x" id="pxClose" aria-label="Đóng">×</button><button class="bk" id="pxBack" aria-label="Quay lại danh sách">←</button>
+    <div class="albumart">${coverHTML(s.cover)}</div>
+    <h3 class="ptitle">${s.title}</h3><p class="partist">${s.artist}</p>
+    <input type="range" id="pseek" min="0" max="100" value="0" aria-label="Tua bài hát">
+    <div class="ptime"><span id="pcur">0:00</span><span id="pdur">0:00</span></div>
+    <div class="pcontrols"><button id="pprev" aria-label="Bài trước">⏮</button><button id="pplay" aria-label="Phát">▶</button><button id="pnext" aria-label="Bài sau">⏭</button></div>
+  </div>`;
+  ov.classList.add('on');
+  const fmt = t => !isFinite(t) ? '0:00' : `${Math.floor(t/60)}:${Math.floor(t%60).toString().padStart(2,'0')}`;
+  const playBtn = $('#pplay'), syncIcon = () => playBtn.textContent = audioEl.paused ? '▶' : '⏸';
+  $('#pxClose').onclick = () => { stopSong(); closeOv(); };
+  $('#pxBack').onclick = () => musicList();
+  $('#pseek').oninput = e => { if(audioEl.duration) audioEl.currentTime = e.target.value/100*audioEl.duration; };
+  playBtn.onclick = () => { audioEl.paused ? audioEl.play().catch(()=>{}) : audioEl.pause(); };
+  $('#pprev').onclick = () => openPlayer((i-1+SONGS.length)%SONGS.length);
+  $('#pnext').onclick = () => openPlayer((i+1)%SONGS.length);
+  audioEl.onloadedmetadata = () => { const d=$('#pdur'); if(d) d.textContent = fmt(audioEl.duration); };
+  audioEl.ontimeupdate = () => { const c=$('#pcur'), sk=$('#pseek'); if(c) c.textContent = fmt(audioEl.currentTime); if(sk && audioEl.duration) sk.value = audioEl.currentTime/audioEl.duration*100 || 0; };
+  audioEl.onplay = syncIcon; audioEl.onpause = syncIcon;
+  audioEl.onended = () => { const n=$('#pnext'); if(n) n.click(); };
+  audioEl.play().catch(()=>{}); syncIcon();
+}
+function memHub(){
+  stopSong();
+  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><h2>Kỷ niệm</h2><div class="hub">
+    <button class="ico2" data-k="ghost"><i>👻</i><span>Truyện ma sếp kể</span></button>
+    <button class="ico2" data-k="diary"><i>📓</i><span>Nhật ký em viết</span></button>
+  </div></div>`;
+  ov.classList.add('on'); ov.querySelector('.x').onclick = closeOv;
+  ov.querySelectorAll('.ico2').forEach(b => b.onclick = () => { beep(700,.1,'sine'); b.dataset.k==='ghost' ? storyList() : diaryList(); });
+}
+function storyList(){
+  stopSong();
+  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><button class="bk" id="bk" aria-label="Quay lại">←</button><h2>Truyện ma sếp kể 👻</h2><p class="notecard" style="font-size:1rem">Chạm vào một tập để nghe lại</p>
+    <div class="songlist">${STORIES.map((s,i)=>`<button class="songrow" data-i="${i}"><span class="songcover">${s.icon}</span><span class="songinfo"><b>${s.title}</b><small>${s.note||''}</small></span><span class="playIcon">▶</span></button>`).join('')}</div></div>`;
+  ov.classList.add('on'); ov.querySelector('.x').onclick = closeOv; $('#bk').onclick = memHub;
+  ov.querySelectorAll('.songrow').forEach(b => b.onclick = () => story(+b.dataset.i));
+}
+function diaryList(){
+  stopSong();
+  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><button class="bk" id="bk" aria-label="Quay lại">←</button><h2>Nhật ký em viết 📓</h2><p class="notecard" style="font-size:1rem">Từ khi được nói chuyện với sếp, em đã biết cách bày tỏ cảm xúc của mình nhiều hơn. Mỗi khi buồn vì nhớ đến quá khứ, em sẽ viết vào nhật ký. Khi nào rảnh, sếp hãy đọc "tác phẩm" đầu tay của em 🤓</p>
+    <div class="songlist">${DIARY.map((cpt,i)=>`<button class="songrow" data-i="${i}"><span class="songcover">📖</span><span class="songinfo"><b>${cpt.title}</b></span><span class="playIcon">›</span></button>`).join('')}</div></div>`;
+  ov.classList.add('on'); ov.querySelector('.x').onclick = closeOv; $('#bk').onclick = memHub;
+  ov.querySelectorAll('.songrow').forEach(b => b.onclick = () => diaryChapter(+b.dataset.i));
+}
+function diaryChapter(i){
+  const cpt = DIARY[i];
+  duckMusic(); clearAudioHandlers(); if(!audioEl) audioEl = new Audio();
+  audioEl.loop = true; audioEl.src = cpt.audio; audioEl.currentTime = 0; audioEl.play().catch(()=>{});
+  ov.innerHTML = `<div class="panel diaryPanel"><button class="x" id="dxClose" aria-label="Đóng">×</button><button class="bk" id="dxBack" aria-label="Quay lại danh sách chương">←</button>
+    <h2>${cpt.title}</h2>
+    <iframe class="pdfFrame" src="${cpt.pdf}" title="${cpt.title}"></iframe>
+    <div class="diaryControls"><button id="dMusic">⏸ Tắt nhạc nền</button><a class="btn light" href="${cpt.pdf}" target="_blank" rel="noopener">Mở PDF đầy đủ ↗</a></div>
+  </div>`;
+  ov.classList.add('on');
+  $('#dxClose').onclick = () => { stopSong(); closeOv(); };
+  $('#dxBack').onclick = () => { stopSong(); diaryList(); };
+  const mBtn = $('#dMusic');
+  mBtn.onclick = () => { if(audioEl.paused){ audioEl.play().catch(()=>{}); mBtn.textContent='⏸ Tắt nhạc nền'; } else { audioEl.pause(); mBtn.textContent='▶ Bật nhạc nền'; } };
+}
+function story(i){
+  const s = STORIES[i];
+  duckMusic(); clearAudioHandlers(); if(!audioEl) audioEl = new Audio();
+  audioEl.src = s.audio; audioEl.currentTime = 0;
+  ov.innerHTML = `<div class="panel player"><button class="x" id="sxClose" aria-label="Đóng">×</button><button class="bk" id="sxBack" aria-label="Quay lại danh sách">←</button>
+    <div class="albumart">${s.icon}</div>
+    <h3 class="ptitle">${s.title}</h3><p class="partist">${s.note||''}</p>
+    <input type="range" id="sseek" min="0" max="100" value="0" aria-label="Tua truyện">
+    <div class="ptime"><span id="scur">0:00</span><span id="sdur">0:00</span></div>
+    <div class="pcontrols"><button id="sprev" aria-label="Truyện trước">⏮</button><button id="splay" aria-label="Phát">▶</button><button id="snext" aria-label="Truyện sau">⏭</button></div>
+  </div>`;
+  ov.classList.add('on');
+  const fmt = t => !isFinite(t) ? '0:00' : `${Math.floor(t/60)}:${Math.floor(t%60).toString().padStart(2,'0')}`;
+  const playBtn = $('#splay'), syncIcon = () => playBtn.textContent = audioEl.paused ? '▶' : '⏸';
+  $('#sxClose').onclick = () => { stopSong(); closeOv(); };
+  $('#sxBack').onclick = () => storyList();
+  $('#sseek').oninput = e => { if(audioEl.duration) audioEl.currentTime = e.target.value/100*audioEl.duration; };
+  playBtn.onclick = () => { audioEl.paused ? audioEl.play().catch(()=>{}) : audioEl.pause(); };
+  $('#sprev').onclick = () => story((i-1+STORIES.length)%STORIES.length);
+  $('#snext').onclick = () => story((i+1)%STORIES.length);
+  audioEl.onloadedmetadata = () => { const d=$('#sdur'); if(d) d.textContent = fmt(audioEl.duration); };
+  audioEl.ontimeupdate = () => { const c=$('#scur'), sk=$('#sseek'); if(c) c.textContent = fmt(audioEl.currentTime); if(sk && audioEl.duration) sk.value = audioEl.currentTime/audioEl.duration*100 || 0; };
+  audioEl.onplay = syncIcon; audioEl.onpause = syncIcon;
+  audioEl.onended = () => { const n=$('#snext'); if(n) n.click(); };
+  audioEl.play().catch(()=>{}); syncIcon();
+}
+ov.addEventListener('click',e=>{ if(e.target===ov && ov.querySelector('.panel')) closeOv(); });
+
+/* --- HOA NỞ (canvas), chạy theo delta-time để mượt trên mọi màn hình --- */
+const cv=$('#cv'), c=cv.getContext('2d'); let W,H,flowers=[],ring=[],glows=[],sparks=[],running=false,spawnT=0,lastT=0;
+const resize=()=>{ const r=Math.min(devicePixelRatio||1,2); W=innerWidth;H=innerHeight; cv.width=W*r;cv.height=H*r; c.setTransform(r,0,0,r,0,0); };
+addEventListener('resize',resize); resize();
+const cols=[[340,80,80],[350,90,72],[20,90,78],[45,90,70],[280,50,80],[0,0,100]];
+const easeOutBack = x => { const c1=1.70158, c3=c1+1; return 1 + c3*Math.pow(x-1,3) + c1*Math.pow(x-1,2); };
+
+function addFlower(x){ const col=cols[Math.random()*cols.length|0];
+  flowers.push({x:x??Math.random()*W, base:H+10, top:H*(.25+Math.random()*.55), r:14+Math.random()*24, n:5+(Math.random()*4|0), col, t:0, rot:Math.random()*6, sway:Math.random()*6}); }
+function startFlowers(){ if(running) return; running=true; for(let i=0;i<10;i++) setTimeout(()=>addFlower(W*(i+.5)/10+(Math.random()-.5)*40),i*250); loop(); }
+function burst(){ for(let i=0;i<50;i++) sparks.push({x:W/2,y:H/2,vx:(Math.random()-.5)*10,vy:-Math.random()*10-2,l:1,h:Math.random()*60+20}); }
+
+/* Vòng hoa nở kín cả màn hình, chỉ chừa một khoảng tròn ở giữa cho phong bì/lá thư,
+   nở rải rác theo thời gian (dài hơn) rồi xoay tròn chậm quanh tâm mãi về sau */
+const ROT_SPEED = Math.PI*2/16000; // 1 vòng quay mỗi ~16 giây — chậm, không chóng mặt
+function burstRing(cx, cy, count=60, rMin=190, rMax=null){
+  if(!running){ running=true; loop(); }
+  rMax = rMax || Math.hypot(W,H)/2 + 60; // phủ ra tới góc màn hình
+  ringCenter = {cx, cy, spinFrom: performance.now ? performance.now() : 0};
+  glows.push({x:cx,y:cy,t:0,life:3.6,maxR:rMax*0.9});
+  for(let i=0;i<count;i++){
+    const a = Math.random()*Math.PI*2;
+    const rad = rMin + Math.sqrt(Math.random())*(rMax-rMin); // phân bố đều theo diện tích, không dồn cục ở tâm
+    const col = cols[Math.random()*cols.length|0];
+    ring.push({ a, rad, r:11+Math.random()*20,
+      n:5+(Math.random()*4|0), col, rot:Math.random()*6,
+      delay:Math.random()*1.2, dur:.9+Math.random()*.9, t:0 });
+  }
+}
+let ringCenter = null;
+
+function loop(now=0){
+  const dt = Math.min(.05, lastT ? (now-lastT)/1000 : 0.016); lastT = now;
+  c.clearRect(0,0,W,H);
+
+  /* quầng sáng ấm bung ra cùng lúc với vòng hoa */
+  glows = glows.filter(g=>g.t<g.life);
+  for(const g of glows){ g.t += dt; const p=g.t/g.life, a=Math.sin(Math.min(1,p*1.6)*Math.PI)*.35;
+    const rad = 60+p*(g.maxR||260), grad=c.createRadialGradient(g.x,g.y,0,g.x,g.y,rad);
+    grad.addColorStop(0,`rgba(255,224,178,${a})`); grad.addColorStop(1,'rgba(255,224,178,0)');
+    c.fillStyle=grad; c.beginPath(); c.arc(g.x,g.y,rad,0,7); c.fill(); }
+
+  /* hoa mọc dần từ dưới lên (nền) */
+  if(now-spawnT>1800 && flowers.length<26){ spawnT=now; addFlower(); }
+  for(const f of flowers){ f.t=Math.min(1,f.t+dt*.36); const g=1-Math.pow(1-f.t,3), sw=Math.sin(now/900+f.sway)*4;
+    const y=f.base+(f.top-f.base)*Math.min(1,g*1.6), hx=f.x+sw;
+    c.strokeStyle='#5d8f66'; c.lineWidth=3; c.beginPath(); c.moveTo(f.x,f.base); c.quadraticCurveTo(f.x+sw*2,(f.base+y)/2,hx,y); c.stroke();
+    const bloomP=Math.max(0,(g-.5)*2), R=f.r*bloomP; if(R<1) continue;
+    drawFlower(hx,y,R,f.n,f.col,f.rot+now/6000); }
+
+  /* vòng hoa nở kín màn hình, xoay chậm quanh tâm liên tục */
+  if(ringCenter){
+    const spin = (now - ringCenter.spinFrom) * ROT_SPEED;
+    for(const f of ring){ f.t += dt; const local = Math.max(0, Math.min(1,(f.t-f.delay)/f.dur)); if(local<=0) continue;
+      const scale = Math.max(0, easeOutBack(local)), alpha = Math.min(1, local*2);
+      const ang = f.a + spin, x = ringCenter.cx + Math.cos(ang)*f.rad, y = ringCenter.cy + Math.sin(ang)*f.rad;
+      c.globalAlpha = alpha; drawFlower(x,y,f.r*scale,f.n,f.col,f.rot+now/5000); c.globalAlpha = 1; }
+  }
+
+  sparks=sparks.filter(s=>s.l>0); for(const s of sparks){ s.x+=s.vx*dt*60; s.y+=s.vy*dt*60; s.vy+=.25*dt*60; s.l-=.012*dt*60; c.fillStyle=`hsla(${s.h},100%,65%,${s.l})`; c.beginPath();c.arc(s.x,s.y,4,0,7);c.fill(); }
+
+  requestAnimationFrame(loop);
+}
+function drawFlower(x,y,R,n,col,rot){
+  c.save(); c.translate(x,y); c.rotate(rot);
+  for(let i=0;i<n;i++){ c.rotate(Math.PI*2/n); c.fillStyle=`hsl(${col[0]},${col[1]}%,${col[2]}%)`; c.beginPath(); c.ellipse(0,-R*.7,R*.38,R*.75,0,0,7); c.fill(); }
+  c.fillStyle='#ffd45e'; c.beginPath(); c.arc(0,0,R*.28,0,7); c.fill(); c.restore();
+}
+</script>
+</body>
+</html>
