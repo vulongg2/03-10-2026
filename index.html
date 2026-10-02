@@ -8,10 +8,10 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#1a1024">
 <title>Happy Birthday Boss</title>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mali:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
 <style>
 :root{--plum:#1a1024;--rose:#f2a7b8;--paper:#fbf3e6;--gold:#e8c27a;--sage:#9cc5a1;--ink:#3b2a34;
---serif:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace;--sans:'JetBrains Mono',ui-monospace,'SF Mono',Consolas,monospace}
+--serif:'Mali',system-ui,-apple-system,sans-serif;--sans:'Mali',system-ui,-apple-system,sans-serif}
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:var(--plum);font-family:var(--sans);color:#fff}
@@ -58,7 +58,10 @@ body.day .hint{color:var(--plum)}
 /* LETTER */
 .overlay{position:fixed;inset:0;z-index:5;display:none;align-items:center;justify-content:center;padding:16px;background:#1a102466;backdrop-filter:blur(3px)}
 .overlay.on{display:flex}
-.paper{background:var(--paper);color:var(--ink);width:min(560px,100%);max-height:88vh;overflow:auto;border-radius:6px;padding:34px 30px 26px;font:500 1.25rem/1.75 var(--serif);box-shadow:0 30px 80px #0008;animation:pop .8s cubic-bezier(.2,1.6,.4,1)}
+.paper{position:relative;background:var(--paper);color:var(--ink);width:min(560px,100%);max-height:88vh;overflow:auto;border-radius:6px;padding:34px 30px 26px;font:500 1.25rem/1.75 var(--serif);box-shadow:0 30px 80px #0008;border:1px solid #a8506a3d;outline:5px double #a8506a30;outline-offset:-13px;animation:pop .8s cubic-bezier(.2,1.6,.4,1)}
+.paper::before,.paper::after{content:"✦";position:absolute;font-size:.85rem;color:#a8506a70;pointer-events:none}
+.paper::before{top:18px;left:18px}
+.paper::after{bottom:18px;right:18px}
 /* Ẩn thanh cuộn nhưng vẫn cuộn được bằng lăn chuột / vuốt tay */
 .paper{scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
 .paper::-webkit-scrollbar{width:0;height:0;display:none}
@@ -89,7 +92,7 @@ body.day .hint{color:var(--plum)}
 .letterdate{text-align:right;font-family:var(--sans);font-size:.8rem;opacity:.55;margin-bottom:6px}
 .sign{font:italic 600 1.15rem var(--sans);text-align:right;margin-top:10px;opacity:0;transition:.6s}
 .sign.show{opacity:1}
-.divider{border:0;border-top:1px solid #a8506a44;margin:10px 0}
+.divider{border:0;border-top:1.5px dashed #a8506a55;margin:10px 0}
 .wform{display:flex;flex-direction:column;gap:10px;margin-top:6px}
 .wform input,.wform textarea{font:500 1rem var(--sans);padding:12px 14px;border-radius:10px;border:1px solid #a8506a33;background:#fff;color:var(--ink);resize:vertical}
 .wform input:focus,.wform textarea:focus{outline:2px solid #a8506a55}
@@ -121,12 +124,12 @@ body.day .hint{color:var(--plum)}
 .pcontrols button{font-size:1.5rem;background:none;color:var(--ink)}
 #pplay{width:62px;height:62px;border-radius:50%;background:var(--ink);color:#fff;font-size:1.5rem;display:grid;place-items:center}
 
-/* DIARY (PDF + nhạc nền theo chương) */
-.diaryPanel{padding-top:46px}
-.pdfFrame{width:100%;height:56vh;border:0;border-radius:10px;background:#fff;box-shadow:0 4px 16px #0002;margin-top:10px}
-.diaryControls{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
-.diaryControls button{padding:10px 18px;border-radius:99px;background:#a8506a;color:#fff;font-weight:600}
-.diaryControls .btn.light{background:#00000010;color:var(--ink);padding:10px 18px;border-radius:99px}
+/* MỞ KHI... (envelope cards theo tâm trạng) */
+.openwhen-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin-top:14px}
+.ow-card{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 10px;border-radius:14px;background:#fff;box-shadow:0 6px 18px #a8506a22;transition:.2s}
+.ow-card:active{transform:scale(.96)}
+.ow-card i{font-style:normal;font-size:2.1rem}
+.ow-card span{font:600 .9rem var(--sans);color:var(--ink);text-align:center}
 
 /* PANELS */
 .panel{background:var(--paper);color:var(--ink);width:min(620px,100%);max-height:90vh;overflow:auto;border-radius:16px;padding:26px;position:relative;animation:pop .6s cubic-bezier(.2,1.4,.4,1);scrollbar-width:none;-ms-overflow-style:none;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
@@ -182,6 +185,12 @@ body.day .hint{color:var(--plum)}
   .orbit{max-height:340px}
   .title{margin-top:6px}
 }
+
+/* Thư to hơn hẳn trên máy tính/màn hình rộng */
+@media (min-width:860px){
+  .paper{width:min(760px,70vw);padding:52px 58px 42px;font-size:1.42rem}
+  .paper h2{font-size:2.1rem}
+}
 </style>
 </head>
 <body>
@@ -224,7 +233,7 @@ body.day .hint{color:var(--plum)}
 
 <script>
 /* ===================== CONFIG — SỬA Ở ĐÂY ===================== */
-const CODE = "1";          // mật mã (chỉ số). Ví dụ ngày sinh 02/02/2006
+const CODE = "03102009";          // mật mã (chỉ số). Ví dụ ngày sinh 02/02/2006
 const NAME = "Bùi Ngọc Hải An";              // tên bạn của bạn
 const BIRTHDAY_LETTER = `Gửi ${NAME},
 
@@ -240,12 +249,16 @@ Em xin tặng sếp món quà nhỏ này, mong nó sẽ làm sếp vui chút =) 
 
 — Người gửi`;
 const THANKS_LETTER = `
-Cảm ơn sếp vì đã xuất hiện trong khoảng thời gian này. 6 tháng qua đủ dài để em cảm nhận được niềm vui của cuộc sống.. Thú thật với sếp, giờ em không còn nhớ 6 tháng trước mình làm gì vào buổi tối nữa. Bởi vì những mất mát xảy ra quá nhanh khiến cho em không kịp thích nghi nên đã tự giấu cảm xúc mình vào. Đã lâu rồi em không cảm thấy thú vui hay dư vị gì trong từng ngày của cuộc sống. Nhưng nhờ có sếp, em như lại được quay trở lại làm con người trước kia. Dù là vô tình nhưng sự vô tư của sếp đã giúp em rất nhiều.
+Cảm ơn sếp vì đã xuất hiện trong khoảng thời gian này.
 
-Em cảm ơn sếp. Chúc sếp tận hưởng tuổi 17 thật vui vẻ và hạnh phúc.
+6 tháng qua cũng đủ lâu để em nhận ra là mình đã vui hơn trước khá nhiều. Thú thật với sếp, giờ em còn chẳng nhớ 6 tháng trước hàng ngày mình thường làm gì nữa. Có một khoảng thời gian mọi thứ xảy ra hơi nhanh, em cũng không biết phải đối diện với nó thế nào nên cứ tự giữ mọi thứ trong lòng.
+
+Lâu rồi em mới lại thấy một ngày trôi qua cũng có cái để mong chờ. Dù là vô tình, nhưng sự vô tư của sếp đã giúp em rất nhiều đấyyy.
+
+Cảm ơn sếp nhé. Chúc sếp tuổi 17 thật vui và có một sinh nhật thật đáng nhớ.
 
 -Người gửi
-                        Vũ Hoàng Long`;
+`;
 const STORIES = [   // các tập "Truyện ma sếp kể" — nghe bằng audio, giống trình phát nhạc. Thêm bao nhiêu tập cũng được
   {icon:"👻", title:"Ma ở chùa", note:"Đánh giá 6/10 độ ghê nha.", audio:"assets/audio/story1.mp4"},
   {icon:"🕯️", title:"Khu đất đắp ao", note:"Chỗ này em ở nên 8/10", audio:"assets/audio/story2.mp3"},
@@ -254,12 +267,92 @@ const STORIES = [   // các tập "Truyện ma sếp kể" — nghe bằng audio
   {icon:"👻", title:"Mơ quá dị dạng", note:"Cái này mơ nên 6/10", audio:"assets/audio/story5.mp3"},
 
 ];
-const DIARY = [   // "Nhật ký em viết" — mỗi chương 1 file PDF riêng + 1 bài nhạc nền riêng khi đọc
-  {title:"Chương 1", pdf:"assets/diary/chuong1.pdf", audio:"assets/diary/ch1.mp3"},
-  {title:"Chương 2", pdf:"assets/diary/chuong2.pdf", audio:"assets/diary/ch2.mp3"},
-  
+const OPEN_WHEN = [   // "Mở khi..." — mỗi thẻ là 1 phong thư theo tâm trạng, thêm bớt tùy ý
+  {icon:"😢", label:"Mở khi sếp buồn", text:`
+Nếu sếp đang đọc bức này thì chắc hôm nay không được vui lắm nhỉ.
+
+Em cũng chẳng biết hôm nay sếp đã gặp chuyện gì, nên em không định nói mấy câu kiểu “đừng buồn nữa” hay “mọi chuyện rồi sẽ ổn thôi”. Có những ngày mệt thì cứ mệt một chút cũng được. Không phải lúc nào mình cũng phải tỏ ra ổn.
+
+Nếu có chuyện gì khiến sếp buồn, mong là sếp đừng giữ nó một mình quá lâu. Có thể hôm nay chưa giải quyết được, nhưng ít nhất cũng cho bản thân một chút thời gian để nghỉ ngơi đã.
+
+Với cả, nếu hôm nay chẳng muốn làm gì thì cũng không sao. Ăn gì đó ngon ngon, nghe nhạc, ngủ một giấc thật dài, hoặc kiếm ai đó nói chuyện linh tinh cũng được =))
+
+Em không biết mình có giúp được gì không, nhưng ít nhất sếp có thể nhớ là ở đâu đó vẫn có một người rất vui vì đã được biết sếp.
+
+Thôi,sếp buồn vừa thôi nhée.
+
+Ngày mai trời lại sángg.`},
+  {icon:"🤓", label:"Mở khi nhớ em", text:`
+Nếu sếp đang mở bức này thì chắc là hôm nay tự nhiên nhớ đến mấy cuộc nói chuyện linh tinh của chúng ta rồi =))
+
+6 tháng qua có khá nhiều chuyện chẳng đâu vào đâu nhỉ. Có những hôm chỉ ngồi nói chuyện linh tinh, kể chuyện ma, rồi chẳng biết từ lúc nào đã hết cả buổi tối.
+
+Sau này có thể mỗi người sẽ bận hơn, cũng có thể sẽ có những khoảng thời gian không nói chuyện nhiều như bây giờ.
+
+Nhưng nếu một ngày nào đó sếp vô tình nhớ lại những buổi tối ấy, thì mong là sếp sẽ nhớ chúng như một khoảng thời gian khá vui.
+
+Còn nếu nhớ quá thì...nhắn em một câu cũng được =))
+
+Em sẽ thấy rất vuii đấyy.`},
+  {icon:"😮‍💨", label:"Mở khi sếp thấy mệt mỏi", text:`
+Nếu sếp đang mệt thì trước hết...cứ nghỉ đi đãaa.
+
+Không cần phải cố làm hết mọi thứ trong một ngày đâu.
+Có những hôm chẳng làm được gì nhiều cũng không sao cả.
+
+Nếu hôm nay học hành mệt, công việc mệt, hoặc đơn giản là chẳng hiểu sao tự nhiên thấy mệt thì cứ cho bản thân nghỉ một chút.
+Ăn gì đó ngon ngon, nằm xuống, nghe nhạc hoặc xem gì đó linh tinh cũng được.
+
+Không phải lúc nào mình cũng cần phải cố gắng.
+Có những ngày chỉ cần đi qua được một ngày bình thường thôi cũng đã đủ rồi.
+
+Với cả đừng thức khuya quá nhé.
+Em biết câu này nghe hơi giống người già nhưng mà...
+ngủ đi sếp =))
+
+Mai dậy rồi tính tiếp.`},
+  {icon:"🥳", label:"Mở khi sếp thấy vui", text:`
+WWOWW, Today my boss is happy =))
+
+Em không biết hôm nay có chuyện gì vui, nhưng nếu đã vui thì nhớ tận hưởng cho hết nhé.
+Đừng vừa vui được một lúc đã nghĩ xem ngày mai phải làm gì nữa.
+Hãy cứ tận hưởng hiện tại nì.
+
+Có những ngày chẳng cần lý do gì to tát cả.
+Một món ăn ngon, một câu chuyện buồn cười, một ngày học không quá mệt, hay đơn giản là tự nhiên thấy tâm trạng tốt hơn hôm qua một chút...thế là đủ vui rồii.
+
+Nếu hôm nay có chuyện gì đặc biệt thì nhớ kể em nghe nữa.
+Còn nếu chẳng có gì để kể thì cũng chẳng sao =))
+
+Chúc sếp giữ được tâm trạng này lâu lâu một chút nhé.
+
+Hôm nay vui thì cứ vui thật nhiều đi 🎉
+`},
+{icon:"😠", label:"Mở khi sếp thấy giận", text:`
+Ô sao tuất nào lại trêu sếp đấy àa.
+Hay là có việc gì làm sếp bực mình hả.
+
+Em không biết nay sếp bực chuyện gì. Bực bài vở, bực người ngoài, hay tự nhiên hôm nay thức dậy đã thấy ghét cả thế giới. Nhưng mà tức thì cứ tức thôi, không việc gì phải giữ trong lòng cả.
+
+Cứ xả hết cơn giận này đii. Đi ăn cái gì ngon, nghe nhạc làm mình thấy vui hay kể cho em cũng được =)).
+
+Đôi khi nhiều lúc cuộc đời không theo ý mình. Cho nên sếp hãy xả hết cơn giận này và mau quên đi nhé hehe.
+`},
+{icon:"🤯",label:"Mở khi sếp cần một người lắng nghe",text:`
+Sếp muốn nói chuyện gì đấyy.
+
+Bình thường toàn nói mấy chuyện xàm xàm tấu hài, nhưng nếu hôm nay sếp thấy mệt mỏi, áp lực hay có chuyện gì nghẹn trong lòng mà không biết kể cho ai, thì cứ nhắn hết cho emm.
+
+Mình kết bạn Zalo, IG, Tiktok rồi đấy. 
+
+Nếu em không rep thì sếp cứ nhắn qua Zalo, em sợ Zalo nhất nên hay kiểm tra lắm =)) . 
+
+Em biết nhiều lúc sếp chẳng cần một lời khuyên đâu, chỉ cần một người chịu ngồi im để sếp xả bớt đống suy nghĩ lộn xộn trong đầu thôi. Wifi nhà em mạnh lắm nên không sợ đâu =)).
+
+Nhưng mà nhớ thăng chức cho tôi nha 🤓
+`}
 ];
-const GIFT_TEXT = `🎉 + 222.222đ! \n\n(Sếp đợi chút để em bảo kế toán giải ngân.)`;
+const GIFT_TEXT = `🎉 + 310.209đ! \n\n(Sếp đợi chút để em bảo kế toán giải ngân.)`;
 const WEB3FORMS_KEY = "044e547d-c9f9-465e-8730-87ab1f2b9df9";    // Access Key từ web3forms.com
 const TO_NAME = "Long";      // tên người sẽ nhận thông báo (hiện trong nút "Gửi cho ...")
 const WISHES = [  // mỗi mục 1 thẻ trong Wishlist. type: "link" | "link_size" | "text"
@@ -273,11 +366,12 @@ const MUSIC = "assets/bg/song.mp3";                 // ví dụ "assets/music/so
 const LOCK_HINTS = [
   "Sai ruii",
   "Hình như là ngày sinhh.",
-  "Ngày sinh của sếp ấyyy =)) 💡"
+  "Ngày sinh của sếp ấyyy =)) 💡",
+  "Mật khẩu la 03102009 bà ôi 😭"
 ];
 const LETTER_DATE = "03.10.2026";     // ngày hiện trên thư, sửa theo ý bạn
 const SIGNATURE = "Trưởng phòng tài chính — Long";           // chữ ký cuối thư
-const PLAYLIST_NOTE = "Full J97";
+const PLAYLIST_NOTE = "Full J97 :))";
 const SONGS = [
   {title: "Hồng Nhan", artist: "J97", url: "assets/song/song1.m4a", cover: "assets/cover/song1.jpg"},
   {title: "Bạc Phận", artist: "J97", url: "assets/song/song2.m4a", cover: "assets/cover/song2.jpg"},
@@ -307,8 +401,8 @@ const SONGS = [
 const STICKY_NOTES = [   // chỉ hiện trên màn hình rộng (≥700px). top/left tính theo % màn hình, rot là góc nghiêng
   {text:"Chúc sếp học giỏi, thi đâu đỗ đấy!", top:"20%", left:"6%",  rot:-6},
   {text:"Đừng thức khuya quá sếp ơiii 🥱", top:"55%", left:"5%",  rot:4},
-  {text:"Cảm ơn vì đã luôn lắng nghe em 🥹", top:"22%", left:"88%", rot:5},
-  {text:"Sếp là người sếp tốt nhất em từng gặp!", top:"58%", left:"87%", rot:-4},
+  {text:"Cảm ơn vì đã luôn lắng nghe em ", top:"22%", left:"88%", rot:5},
+  {text:"Mong sếp sẽ thật vuii!", top:"58%", left:"87%", rot:-4},
 ];
 const TYPE_MS = 50;               // tốc độ gõ (ms/ký tự)
 /* =============================================================== */
@@ -442,7 +536,7 @@ document.querySelectorAll('.ico').forEach(b => b.onclick = () => panel(b.dataset
 /* --- 4. NỘI DUNG CÁC ICON --- */
 function panel(k){
   beep(700,.1,'sine');
-  if(k==='thanks') return openLetter('Thư cảm ơn 💌', THANKS_LETTER, 'Đóng', null);
+  if(k==='thanks') return openLetter('Thư cảm ơn 💌', THANKS_LETTER, 'Đóng', null, {sign:'Vũ Hoàng Long'});
   if(k==='memories') return memHub();
   let h='';
   if(k==='music') return musicList();
@@ -474,7 +568,7 @@ function wishForm(i){
     msg += `Địa chỉ nhận: ${$('#waddr').value || '(để trống)'}\n`;
     msg += `Thời gian: ${new Date().toLocaleString('vi-VN')}`;
     const ok = await sendNotify(`${NAME} vừa chọn một món trong Wishlist`, msg);
-    $('#wstatus').textContent = ok ? `✉️ Đã gửi rồi. ${TO_NAME} sẽ nhận được món này.` : 'Gửi chưa thành công, thử lại nhé.';
+    $('#wstatus').textContent = ok ? `✉️ Đã gửi rồi. ${TO_NAME} sẽ nhận được thông báo nì.` : 'Gửi chưa thành công, thử lại nhé.';
     if(ok) btn.style.display='none'; else { btn.disabled=false; btn.textContent=`Gửi cho ${TO_NAME}`; }
   };
 }
@@ -515,39 +609,28 @@ function memHub(){
   stopSong();
   ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><h2>Kỷ niệm</h2><div class="hub">
     <button class="ico2" data-k="ghost"><i>👻</i><span>Truyện ma</span></button>
-    <button class="ico2" data-k="diary"><i>📓</i><span>Nhật ký em viết</span></button>
+    <button class="ico2" data-k="openwhen"><i>✉️</i><span>Mở khi...</span></button>
   </div></div>`;
   ov.classList.add('on'); ov.querySelector('.x').onclick = closeOv;
-  ov.querySelectorAll('.ico2').forEach(b => b.onclick = () => { beep(700,.1,'sine'); b.dataset.k==='ghost' ? storyList() : diaryList(); });
+  ov.querySelectorAll('.ico2').forEach(b => b.onclick = () => { beep(700,.1,'sine'); b.dataset.k==='ghost' ? storyList() : openWhenList(); });
 }
 function storyList(){
   stopSong();
-  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><button class="bk" id="bk" aria-label="Quay lại">←</button><h2>Mong sếp nhiều hứu duyên và update thêm 👻</h2><p class="notecard" style="font-size:1rem">Chạm vào một tập để nghe lại</p>
+  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><button class="bk" id="bk" aria-label="Quay lại">←</button><h2>Mong sau nì sẽ có nhiều chuyện hơn 😈</h2><p class="notecard" style="font-size:1rem">Chạm vào một tập để nghe lại</p>
     <div class="songlist">${STORIES.map((s,i)=>`<button class="songrow" data-i="${i}"><span class="songcover">${s.icon}</span><span class="songinfo"><b>${s.title}</b><small>${s.note||''}</small></span><span class="playIcon">▶</span></button>`).join('')}</div></div>`;
   ov.classList.add('on'); ov.querySelector('.x').onclick = closeOv; $('#bk').onclick = memHub;
   ov.querySelectorAll('.songrow').forEach(b => b.onclick = () => story(+b.dataset.i));
 }
-function diaryList(){
+function openWhenList(){
   stopSong();
-  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><button class="bk" id="bk" aria-label="Quay lại">←</button><h2>Nhật ký em viết 📓</h2><p class="notecard" style="font-size:1rem">Từ khi được nói chuyện với sếp, em đã biết cách bày tỏ cảm xúc của mình nhiều hơn. Mỗi khi buồn, em sẽ viết vào nhật ký. Khi nào rảnh, sếp hãy đọc "tác phẩm" đầu tay của em 🤓.</p>
-    <div class="songlist">${DIARY.map((cpt,i)=>`<button class="songrow" data-i="${i}"><span class="songcover">📖</span><span class="songinfo"><b>${cpt.title}</b></span><span class="playIcon">›</span></button>`).join('')}</div></div>`;
+  ov.innerHTML = `<div class="panel"><button class="x" aria-label="Đóng">×</button><button class="bk" id="bk" aria-label="Quay lại">←</button><h2>Mở khi... ✉️</h2><p class="notecard" style="font-size:1rem">Chọn đúng lúc sếp đang cảm thấy vậy nhé</p>
+    <div class="openwhen-grid">${OPEN_WHEN.map((o,i)=>`<button class="ow-card" data-i="${i}"><i>${o.icon}</i><span>${o.label}</span></button>`).join('')}</div></div>`;
   ov.classList.add('on'); ov.querySelector('.x').onclick = closeOv; $('#bk').onclick = memHub;
-  ov.querySelectorAll('.songrow').forEach(b => b.onclick = () => diaryChapter(+b.dataset.i));
-}
-function diaryChapter(i){
-  const cpt = DIARY[i];
-  duckMusic(); clearAudioHandlers(); if(!audioEl) audioEl = new Audio();
-  audioEl.loop = true; audioEl.src = cpt.audio; audioEl.currentTime = 0; audioEl.play().catch(()=>{});
-  ov.innerHTML = `<div class="panel diaryPanel"><button class="x" id="dxClose" aria-label="Đóng">×</button><button class="bk" id="dxBack" aria-label="Quay lại danh sách chương">←</button>
-    <h2>${cpt.title}</h2>
-    <iframe class="pdfFrame" src="${cpt.pdf}" title="${cpt.title}"></iframe>
-    <div class="diaryControls"><button id="dMusic">⏸ Tắt nhạc nền</button><a class="btn light" href="${cpt.pdf}" target="_blank" rel="noopener">Mở PDF đầy đủ ↗</a></div>
-  </div>`;
-  ov.classList.add('on');
-  $('#dxClose').onclick = () => { stopSong(); closeOv(); };
-  $('#dxBack').onclick = () => { stopSong(); diaryList(); };
-  const mBtn = $('#dMusic');
-  mBtn.onclick = () => { if(audioEl.paused){ audioEl.play().catch(()=>{}); mBtn.textContent='⏸ Tắt nhạc nền'; } else { audioEl.pause(); mBtn.textContent='▶ Bật nhạc nền'; } };
+  ov.querySelectorAll('.ow-card').forEach(b => b.onclick = () => {
+    const o = OPEN_WHEN[+b.dataset.i];
+    sendNotify(`${NAME} vừa mở "${o.label}" 💌`, `${NAME} vừa mở phong thư "${o.label}" trên website sinh nhật.\nThời gian: ${new Date().toLocaleString('vi-VN')}`);
+    openLetter(o.label, o.text, 'Đóng', openWhenList, {sign:'Vũ Hoàng Long'});
+  });
 }
 function story(i){
   const s = STORIES[i];
